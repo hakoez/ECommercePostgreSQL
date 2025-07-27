@@ -8,6 +8,6 @@ namespace InventoryManagment
 {
     public class Admin : User
     {
-        // Admin özel işlemler burada tanımlanacak
+        
     }
 }
