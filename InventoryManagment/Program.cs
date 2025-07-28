@@ -1,4 +1,4 @@
-﻿using InventoryManagment;
+using InventoryManagment;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System.IO;
