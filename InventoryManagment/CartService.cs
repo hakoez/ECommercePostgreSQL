@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +21,7 @@ namespace InventoryManagment
         {
             using var conn = new NpgsqlConnection(_connectionString);
             conn.Open();
-
+             
             var cmd = new NpgsqlCommand("INSERT INTO Carts (CustomerId) VALUES (@CustomerId)", conn);
             cmd.Parameters.AddWithValue("@CustomerId", customerId);
             cmd.ExecuteNonQuery();
@@ -63,7 +63,7 @@ namespace InventoryManagment
 
             int cartId = Convert.ToInt32(result);
 
-            // Şimdi sepet içeriğini getir
+            // sepet icerigi
             string sql = @"SELECT ci.Id, p.Name, ci.Quantity, p.Price 
                    FROM CartItems ci 
                    JOIN Products p ON ci.ProductId = p.Id 
@@ -74,6 +74,9 @@ namespace InventoryManagment
 
             using var reader = cmd.ExecuteReader();
             Console.WriteLine("\n--- Sepet İçeriği ---");
+
+            decimal total = 0; //fiyat bilgisi
+
             while (reader.Read())
             {
                 int cartItemId = reader.GetInt32(0);
@@ -81,41 +84,18 @@ namespace InventoryManagment
                 int quantity = reader.GetInt32(2);
                 decimal price = reader.GetDecimal(3);
 
-                Console.WriteLine($"Ürün: {productName} | Miktar: {quantity} | Fiyat: {price:C} | SepetÜrünId: {cartItemId}");
-            }
-        }
+                decimal itemTotal = price * quantity;
+                total += itemTotal;
 
-        // Sepeti listele
-        public void ViewCart(int cartId)
-        {
-            using var conn = new NpgsqlConnection(_connectionString);
-            conn.Open();
-
-            var cmd = new NpgsqlCommand(@"
-                SELECT ci.Id, p.Name, p.Price, ci.Quantity
-                FROM CartItems ci
-                JOIN Products p ON ci.ProductId = p.Id
-                WHERE ci.CartId = @CartId", conn);
-
-            cmd.Parameters.AddWithValue("@CartId", cartId);
-
-            using var reader = cmd.ExecuteReader();
-            decimal total = 0;
-
-            Console.WriteLine("Sepet İçeriği:");
-            while (reader.Read())
-            {
-                var itemId = reader.GetInt32(0);
-                var name = reader.GetString(1);
-                var price = reader.GetDecimal(2);
-                var quantity = reader.GetInt32(3);
-                var subtotal = price * quantity;
-                total += subtotal;
-
-                Console.WriteLine($"ID: {itemId} | {name} - {quantity} x {price}₺ = {subtotal}₺");
+                Console.WriteLine($"Ürün: {productName} | Miktar: {quantity} | Fiyat: {price}TL | Tutar: {itemTotal}TL | SepetÜrünId: {cartItemId}");
             }
 
-            Console.WriteLine($"Toplam Tutar: {total}₺");
+            Console.WriteLine($"\n🧾 Sepet Toplamı: {total}TL");
         }
+
+
+       
+
+
     }
 }
