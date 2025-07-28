@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -41,7 +41,7 @@ namespace InventoryManagment
                 return;
             }
 
-            // Sepet yoksa oluştur (burada müşteri başına 1 sepet olduğunu varsayıyoruz)
+            // Sepet yoksa oluştur
             var cartIdCmd = new NpgsqlCommand("SELECT Id FROM Carts WHERE CustomerId = @customerId", conn);
             cartIdCmd.Parameters.AddWithValue("customerId", customerId);
             var cartIdObj = cartIdCmd.ExecuteScalar();
@@ -93,7 +93,7 @@ namespace InventoryManagment
             using var conn = new NpgsqlConnection(_connectionString);
             conn.Open();
 
-            // 1. Sepeti getir (müşterinin sepeti)
+            //Sepeti getir
             var cartIdCmd = new NpgsqlCommand("SELECT Id FROM Carts WHERE CustomerId = @customerId", conn);
             cartIdCmd.Parameters.AddWithValue("customerId", customerId);
             var cartIdObj = cartIdCmd.ExecuteScalar();
@@ -106,7 +106,7 @@ namespace InventoryManagment
 
             int cartId = (int)cartIdObj;
 
-            // 2. Sepetteki ürünleri çek
+            //Sepetteki ürünleri çek
             var itemsCmd = new NpgsqlCommand(@"
             SELECT ProductId, Quantity 
             FROM CartItems 
@@ -159,7 +159,7 @@ namespace InventoryManagment
                     updateStockCmd.Parameters.AddWithValue("productId", item.ProductId);
                     updateStockCmd.ExecuteNonQuery();
 
-                    // 5. Sipariş ürünlerini ekle (OrderItems tablosu varsayımı)
+                    // 5. Sipariş ürünlerini ekle 
                     var insertOrderItemCmd = new NpgsqlCommand("INSERT INTO OrderItems (OrderId, ProductId, Quantity) VALUES (@orderId, @productId, @quantity)", conn, transaction);
                     insertOrderItemCmd.Parameters.AddWithValue("orderId", orderId);
                     insertOrderItemCmd.Parameters.AddWithValue("productId", item.ProductId);
@@ -258,7 +258,7 @@ namespace InventoryManagment
 
             int cartId = Convert.ToInt32(result);
 
-            // Şimdi sepet içeriğini getir
+            // sepet içeriğini getir
             string sql = @"SELECT ci.Id, p.Name, ci.Quantity, p.Price 
                    FROM CartItems ci 
                    JOIN Products p ON ci.ProductId = p.Id 
